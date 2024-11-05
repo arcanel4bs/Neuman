@@ -38,12 +38,12 @@ export default function RootLayout({
               <p>
                 Powered by{" "}
                 <a
-                  href="https://supabase.com"
+                  href="https://x.com/labsarcane"
                   target="_blank"
                   className="font-bold hover:underline"
                   rel="noreferrer"
                 >
-                  Supabase
+                  ArcaneL4bs
                 </a>
               </p>
               <ThemeSwitcher />

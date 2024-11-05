@@ -5,7 +5,7 @@ import Image from 'next/image'
 function Hero() {
   return (
     <div>
-      <Image src={heroImage} alt="Hero Image" />
+      <Image src={heroImage} alt="hero-image" />
     </div>
   )
 }

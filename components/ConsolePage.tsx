@@ -71,8 +71,13 @@ export default function ConsolePage() {
         <h1 className="text-3xl font-semibold text-white">Neuman</h1>
         <p className="text-gray-400 text-sm mt-1">Synthetic Data Engine</p>
         <div className="absolute right-6">
-          <Link href="/profile">
-            <Button variant="ghost" size="sm" className="text-white">
+          <Link href="/profile" aria-label="Profile Settings">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white"
+            >
+              <span className="sr-only">Profile Settings</span>
               <UserIcon className="h-5 w-5" />
             </Button>
           </Link>
@@ -123,6 +128,7 @@ export default function ConsolePage() {
                       value={format}
                       onChange={(e) => setFormat(e.target.value)}
                       className="appearance-none bg-transparent text-gray-400 text-sm focus:outline-none pl-8 pr-6 py-1"
+                      aria-label="Data Format"
                     >
                       <option value="JSON">JSON</option>
                       <option value="CSV" disabled className="text-gray-600">CSV (Coming Soon)</option>
@@ -135,6 +141,7 @@ export default function ConsolePage() {
                       value={dataSize}
                       onChange={(e) => setDataSize(e.target.value)}
                       className="appearance-none bg-transparent text-gray-400 text-sm focus:outline-none pr-6 py-1"
+                      aria-label="Data Size"
                     >
                       <option value="small">Small</option>
                       <option value="medium">Medium</option>
