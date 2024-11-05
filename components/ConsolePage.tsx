@@ -19,8 +19,9 @@ export default function ConsolePage() {
   const [error, setError] = useState<string | null>(null)
   const [showSuggestions, setShowSuggestions] = useState(true);
   const promptSuggestions = [
-    'stock market broker guru',
-    'medical diagnosis and treatment ai assistant'
+    'medical diagnosis and treatment ai assistant',
+    'equity research analyst',
+    'financial planner'
   ];
 
   const trimTitle = (title: string) => {
