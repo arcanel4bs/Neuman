@@ -1,9 +1,14 @@
 export type Message =
   | { success: string }
   | { error: string }
-  | { message: string };
+  | { message: string }
+  | Record<string, never>;
 
 export function FormMessage({ message }: { message: Message }) {
+  if (!Object.keys(message).length) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full max-w-md text-sm">
       {"success" in message && (

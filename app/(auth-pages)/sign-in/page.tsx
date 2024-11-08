@@ -10,15 +10,18 @@ import { useRouter } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 import { useState } from "react";
 
-type PageProps = {
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
+interface PageProps {
+  searchParams?: { 
+    returnTo?: string;
+    message?: string;
+  };
+}
 
 export default function Login({ searchParams = {} }: PageProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const returnTo = searchParams.returnTo as string || '';
-  const message = searchParams.message ? { message: searchParams.message as string } : {};
+  const returnTo = searchParams.returnTo || '';
+  const message = searchParams.message ? { message: searchParams.message } : {};
 
   async function handleSubmit(formData: FormData) {
     try {

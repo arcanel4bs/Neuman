@@ -10,13 +10,18 @@ import { useRouter } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 import { useState } from "react";
 
-interface SignupProps {
-  searchParams: Message;
+interface PageProps {
+  searchParams?: { 
+    message?: string;
+  };
 }
 
-export default function Signup({ searchParams }: SignupProps) {
+export default function Signup({ searchParams = {} }: PageProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const message: Message = searchParams.message 
+    ? { message: searchParams.message } 
+    : {};
 
   async function handleSubmit(formData: FormData) {
     try {
@@ -90,7 +95,7 @@ export default function Signup({ searchParams }: SignupProps) {
               {isLoading ? "Signing up..." : "Sign up"}
             </SubmitButton>
             
-            <FormMessage message={searchParams} />
+            <FormMessage message={message} />
           </div>
         </form>
       </div>
