@@ -5,7 +5,7 @@ import DataRankingPage from '@/components/DataRankingPage'
 export default async function DataRankingSessionPage({ 
   params 
 }: { 
-  params: Promise<{ sessionId: string }> | { sessionId: string }
+  params: Promise<{ sessionId: string }> 
 }) {
   const { sessionId } = await params
   

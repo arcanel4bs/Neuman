@@ -5,7 +5,7 @@ import DashboardPage from '@/components/DashboardPage'
 export default async function DashboardSessionPage({ 
   params 
 }: { 
-  params: Promise<{ sessionId: string }> | { sessionId: string }
+  params: Promise<{ sessionId: string }> 
 }) {
   const { sessionId } = await params
   
