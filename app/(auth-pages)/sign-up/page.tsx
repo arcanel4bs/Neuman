@@ -8,14 +8,13 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
-export default function Signup() {
+function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Access searchParams directly without using React.use
   const message: Message = searchParams.get('message')
     ? { message: searchParams.get('message')! }
     : {};
@@ -97,5 +96,13 @@ export default function Signup() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function Signup() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupForm />
+    </Suspense>
   );
 }
