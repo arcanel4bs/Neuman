@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 
 export const metadata = {
   title: 'Synthetic Data Engine',
-  description: 'Generate high-quality synthetic data. Power your models with unlimited, relevant data.',
+  description: 'Generate large amounts of high-quality data.',
   alternates: {
     canonical: '/',
   }
@@ -44,13 +44,13 @@ export default async function Index({
       </nav>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-12 sm:pb-20 text-center">
-        <h1 className="text-4xl sm:text-6xl font-light mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-violet-500 leading-tight">
+        <h1 className="text-3xl sm:text-6xl font-light mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-violet-500 leading-tight">
           Synthetic Data Engine
         </h1>
         <p className="text-lg sm:text-xl text-gray-400 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed">
-          Generate high-quality synthetic data for AI training and testing. 
-          Power your models with unlimited, context-aware data.
-          This product is currently experimental.
+          Generate large amounts of high-quality data in seconds. 
+          Visit our <Link href={'/data-ranking'}>data ranking system</Link> to check out how our users are using Neuman.
+          
         </p>
         
         <div className="mb-8 sm:mb-12 rounded-xl overflow-hidden shadow-2xl border border-gray-800">
