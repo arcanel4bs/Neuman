@@ -9,6 +9,7 @@ import {
   removeSimilarities, 
   mergeDataChunks 
 } from '@/utils/dataGeneration';
+import { Json } from '@/lib/database.types';
 
 // Initialize Groq client
 const groq = new Groq({
@@ -18,6 +19,12 @@ const groq = new Groq({
 export async function POST(req: Request) {
   const { prompt, format, dataSize } = await req.json();
   const supabase = await createClient();
+  
+  // Get authenticated user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   
   try {
     const chunkConfig = getChunkConfig(dataSize);
@@ -32,7 +39,56 @@ export async function POST(req: Request) {
         messages: [
           { 
             role: "system", 
-            content: "You are a synthetic data generator. Always respond with valid JSON data only. Do not include any explanatory text, markdown formatting, or code blocks. Just return the raw JSON array or object." 
+            content: `You are a synthetic data generator. Your task is to generate data based on the user's prompt.
+
+- Always respond with **valid ${format} data only**.
+- Do **not** include any explanatory text, markdown formatting, or code blocks.
+- Provide **only** the raw data in **${format}** format.
+- Ensure the output is **strictly compliant** with the ${format} format specifications.
+- If generating JSON, produce a valid JSON array or object with proper syntax.
+- **Do not** include any prefixes, suffixes, or additional commentary.
+
+**Examples:**
+
+- **LLM Training Data:** If the user requests data for training a language model, produce JSON formatted as an array of objects with "question" and "answer" fields. Each object represents a Q&A pair for training.
+
+  Example:
+  \`\`\`json
+  [
+    { "question": "What is the capital of France?", "answer": "Paris" },
+    { "question": "Who wrote '1984'?", "answer": "George Orwell" },
+    ...
+  ]
+  \`\`\`
+
+- **Predictive Data with Trends:** When provided with real-world data and asked to project, generate data that continues the observed trend. Include appropriate fields to represent time series or predictive variables.
+
+  Example:
+  \`\`\`json
+  [
+    { "date": "2023-10-01", "value": 100 },
+    { "date": "2023-11-01", "value": 105 },
+    { "date": "2023-12-01", "value": 110 },
+    ...
+  ]
+  \`\`\`
+
+- **Common Synthetic Data Formats:** Generate data in commonly used formats, such as user profiles, transaction records, or sensor readings. Ensure fields are realistic and values are plausible.
+
+  Example:
+  \`\`\`json
+  [
+    {
+      "id": "user_001",
+      "name": "John Doe",
+      "email": "johndoe@example.com",
+      "created_at": "2023-10-15T12:34:56Z"
+    },
+    ...
+  ]
+  \`\`\`
+
+Always tailor the data to the user's prompt, ensuring it matches the requested context and format.` 
           },
           { 
             role: "user", 
@@ -55,10 +111,11 @@ export async function POST(req: Request) {
       console.log('Extracted data:', generatedData);
 
       // Check if the extracted data is valid
-      if ((format === 'JSON' && !Array.isArray(generatedData) && typeof generatedData !== 'object') ||
-          (format === 'CSV' && typeof generatedData !== 'string') ||
-          (format === 'TXT' && typeof generatedData !== 'string')) {
-        throw new Error(`Invalid ${format} data generated`);
+      if (
+        (format === 'JSON' && (!generatedData || (Array.isArray(generatedData) && generatedData.length === 0))) ||
+        ((format === 'CSV' || format === 'TXT') && (!generatedData || generatedData.trim() === ''))
+      ) {
+        throw new Error(`Invalid or empty ${format} data generated`);
       }
       
       // Remove similarities with previous chunks
@@ -74,6 +131,8 @@ export async function POST(req: Request) {
     // New improved Supabase storage handling
     const timestamp = new Date().toISOString();
     const dataToStore = {
+      session_id: 'default',
+      user_id: user.id,
       prompt,
       format,
       data_size: dataSize,
@@ -101,7 +160,7 @@ export async function POST(req: Request) {
     
     while (retryCount < maxRetries) {
       const { data, error: supabaseError } = await supabase
-        .from('response')
+        .from('responses')
         .insert([dataToStore])
         .select()
         .single();
@@ -139,9 +198,9 @@ export async function POST(req: Request) {
           const { error: logError } = await supabase
             .from('error_logs')
             .insert([{
-              error: supabaseError,
+              error: JSON.stringify(supabaseError) as Json,
               timestamp: new Date().toISOString(),
-              data_sample: JSON.stringify(dataToStore).substring(0, 1000) // First 1000 chars --> increased to 2000 chars
+              data_sample: JSON.stringify(dataToStore).substring(0, 1000)
             }]);
           
           if (logError) {

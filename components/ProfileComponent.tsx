@@ -5,22 +5,25 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { supabase } from '@/utils/supabase/client'
+import type { Database } from '@/lib/database.types'
+
+type UserPreferences = Database['public']['Tables']['user_preferences']['Row']
 
 export default function ProfileComponent() {
   const [email, setEmail] = useState("");
   const [defaultSize, setDefaultSize] = useState("small");
-  const supabase = createClient();
 
   useEffect(() => {
     async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setEmail(user.email || "");
-        // Load user preferences from database here
+        // Load user preferences from database
         const { data: preferences } = await supabase
           .from('user_preferences')
-          .select('default_size')
+          .select()
+          .eq('user_id', user.id)
           .single();
         
         if (preferences) {
@@ -39,6 +42,7 @@ export default function ProfileComponent() {
         .upsert({
           user_id: user.id,
           default_size: defaultSize,
+          updated_at: new Date().toISOString()
         });
     }
   };

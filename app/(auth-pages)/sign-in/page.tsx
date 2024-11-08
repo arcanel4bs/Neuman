@@ -6,8 +6,14 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { IoArrowBack } from "react-icons/io5";
 
-export default async function Login(props: { searchParams: Promise<Message> }) {
+interface LoginProps {
+  searchParams: Promise<{ returnTo?: string } & Message>
+}
+
+export default async function Login(props: LoginProps) {
   const searchParams = await props.searchParams;
+  const returnTo = searchParams.returnTo || '';
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-black relative">
       <Link 
@@ -58,6 +64,12 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                 className="mt-1 bg-gray-800/50 border-gray-700 focus:ring-blue-500 focus:border-transparent rounded-full"
               />
             </div>
+
+            <Input
+              type="hidden"
+              name="returnTo"
+              value={returnTo}
+            />
 
             <SubmitButton 
               pendingText="Signing In..." 

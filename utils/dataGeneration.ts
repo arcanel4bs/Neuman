@@ -5,35 +5,12 @@ export function extractData(content: string, format: string) {
       // First try to parse the content directly
       return JSON.parse(content);
     } catch (e) {
-      // Look for JSON in code blocks with or without language specification
-      const jsonMatches = [
-        content.match(/```json\n([\s\S]*?)\n```/),
-        content.match(/```\n([\s\S]*?)\n```/),
-        content.match(/\[([\s\S]*?)\]/) // Look for array notation
-      ];
-
-      for (const match of jsonMatches) {
-        if (match) {
-          try {
-            const cleaned = match[1].trim();
-            return JSON.parse(cleaned);
-          } catch (e) {
-            continue;
-          }
-        }
+      // Enhanced JSON extraction with partial recovery
+      const extractedData = extractPartialJSON(content);
+      if (extractedData.length > 0) {
+        return extractedData;
       }
-
-      // If all parsing attempts fail, try to extract any JSON-like structure
-      const jsonPattern = /(\[|\{)[\s\S]*?(\]|\})/;
-      const jsonMatch = content.match(jsonPattern);
-      if (jsonMatch) {
-        try {
-          return JSON.parse(jsonMatch[0]);
-        } catch (e) {
-          console.error('Failed to parse JSON structure:', e);
-        }
-      }
-
+      
       console.error('Failed to extract valid JSON data');
       return [];
     }
@@ -51,6 +28,57 @@ export function extractData(content: string, format: string) {
   return content;
 }
 
+function extractPartialJSON(content: string) {
+  const results: any[] = [];
+  
+  // Try different JSON patterns
+  const patterns = [
+    /\{[^{}]*\}/g,  // Match individual objects
+    /\[[^\[\]]*\]/g, // Match arrays
+    /"[^"]+"\s*:\s*("[^"]*"|[\d.]+|true|false|null)/g // Match key-value pairs
+  ];
+
+  for (const pattern of patterns) {
+    const matches = content.match(pattern);
+    if (matches) {
+      for (const match of matches) {
+        try {
+          const parsed = JSON.parse(match);
+          if (parsed) {
+            results.push(parsed);
+          }
+        } catch {
+          // Try to clean and repair the JSON
+          try {
+            const cleaned = match
+              .replace(/,\s*([}\]])/g, '$1') // Remove trailing commas
+              .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3'); // Quote unquoted keys
+            const parsed = JSON.parse(cleaned);
+            if (parsed) {
+              results.push(parsed);
+            }
+          } catch {
+            // Skip if both attempts fail
+            continue;
+          }
+        }
+      }
+    }
+  }
+
+  // If we found any valid JSON objects/arrays
+  if (results.length > 0) {
+    // If all results are objects, wrap them in an array
+    if (results.every(item => typeof item === 'object' && !Array.isArray(item))) {
+      return results;
+    }
+    // If we have a mix of arrays and objects, flatten and combine
+    return results.flat();
+  }
+
+  return [];
+}
+
 export function getChunkConfig(dataSize: string) {
   const configs = {
     small: { chunks: 1, tokensPerChunk: 1024 },
@@ -61,6 +89,9 @@ export function getChunkConfig(dataSize: string) {
 }
 
 export function getTemperature(chunkIndex: number, totalChunks: number) {
+  if (totalChunks <= 1) {
+    return 0.3; // Default temperature value when only one chunk is present
+  }
   return 0.3 + (0.6 * (chunkIndex / (totalChunks - 1)));
 }
 
@@ -99,7 +130,12 @@ export function getDiversePrompt(
     formatInstructions = 'Ensure the output is in valid JSON format. Do not include any explanatory text outside the JSON structure.';
   }
 
-  return `${basePrompt} ${modifier}. ${diversityInstructions} ${formatInstructions}`;
+  const additionalInstructions = `
+- If generating data for training language models, structure the data as an array of question-answer pairs.
+- If the prompt involves real-world data projection, provide data that extends the trend.
+- For common data types (e.g., user profiles, transactions), ensure data realism and field completeness.`;
+
+  return `${basePrompt} ${modifier}. ${diversityInstructions} ${formatInstructions} ${additionalInstructions}`;
 }
 
 export function removeSimilarities(newChunk: any, previousChunks: any[], format: string) {
@@ -222,14 +258,21 @@ function editDistance(s1: string, s2: string) {
 export function mergeDataChunks(chunks: any[], format: string) {
   if (format === 'JSON') {
     try {
-      const mergedData = chunks.reduce((acc, chunk) => {
-        const parsedChunk = typeof chunk === 'string' ? JSON.parse(chunk) : chunk;
-        return acc.concat(Array.isArray(parsedChunk) ? parsedChunk : [parsedChunk]);
-      }, []);
-      return JSON.stringify(mergedData, null, 2);
+      const allValidData = chunks.flatMap(chunk => {
+        if (typeof chunk === 'string') {
+          return extractPartialJSON(chunk);
+        }
+        return Array.isArray(chunk) ? chunk : [chunk];
+      });
+
+      return JSON.stringify(allValidData, null, 2);
     } catch (error) {
       console.error('Error merging JSON chunks:', error);
-      return JSON.stringify(chunks);
+      // Return whatever valid data we could extract
+      const recoveredData = chunks.flatMap(chunk => 
+        typeof chunk === 'string' ? extractPartialJSON(chunk) : [chunk]
+      );
+      return JSON.stringify(recoveredData, null, 2);
     }
   } else if (format === 'CSV') {
     try {
