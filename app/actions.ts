@@ -29,7 +29,7 @@ export async function signInAction(formData: FormData) {
       };
     }
 
-    // Create initial session if none exists
+    // Get or create a session immediately after successful login
     const { data: existingSession } = await supabase
       .from("console_sessions")
       .select()
@@ -39,17 +39,26 @@ export async function signInAction(formData: FormData) {
       .single();
 
     if (!existingSession) {
-      await supabase
+      const { data: newSession } = await supabase
         .from("console_sessions")
         .insert([{
           user_id: data.user.id,
           title: "New Session",
-        }]);
+        }])
+        .select()
+        .single();
+        
+      if (newSession) {
+        redirect(returnTo || `/console/${newSession.id}`);
+      }
+    } else {
+      redirect(returnTo || `/console/${existingSession.id}`);
     }
 
+    // This will only run if redirect() fails
     return {
       success: true,
-      redirectTo: returnTo || "/dashboard"
+      redirectTo: returnTo || "/console"
     };
   } catch (err) {
     console.error("Sign in error:", err);

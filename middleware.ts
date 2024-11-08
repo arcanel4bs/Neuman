@@ -43,6 +43,30 @@ export async function middleware(request: NextRequest) {
     // Add auth state to request headers for components to access
     response.headers.set('x-auth-state', user ? 'authenticated' : 'unauthenticated');
 
+    // Handle auth pages first
+    if (['/sign-in', '/sign-up'].includes(request.nextUrl.pathname)) {
+      if (user) {
+        // If user is authenticated, get their active session
+        const { data: session } = await supabase
+          .from('console_sessions')
+          .select()
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        const returnTo = request.nextUrl.searchParams.get('returnTo');
+        if (returnTo) {
+          return NextResponse.redirect(new URL(returnTo, request.url));
+        } else if (session) {
+          return NextResponse.redirect(new URL(`/console/${session.id}`, request.url));
+        } else {
+          return NextResponse.redirect(new URL('/console', request.url));
+        }
+      }
+      return response;
+    }
+
     // Protect routes that require authentication
     const protectedRoutes = [
       '/dashboard',
@@ -51,27 +75,14 @@ export async function middleware(request: NextRequest) {
       '/dashboard/[sessionId]',
       '/console/[sessionId]',
       '/data-ranking/[sessionId]'
-    ]
+    ];
+
     if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
       if (!user) {
-        const signInUrl = new URL('/sign-in', request.url)
-        signInUrl.searchParams.set('returnTo', request.nextUrl.pathname)
-        return NextResponse.redirect(signInUrl)
+        const signInUrl = new URL('/sign-in', request.url);
+        signInUrl.searchParams.set('returnTo', request.nextUrl.pathname);
+        return NextResponse.redirect(signInUrl);
       }
-    }
-
-    // Redirect authenticated users away from auth pages
-    if (['/sign-in', '/sign-up'].includes(request.nextUrl.pathname)) {
-      if (user) {
-        // Check if there's a return URL, otherwise go to console
-        const returnTo = request.nextUrl.searchParams.get('returnTo')
-        return NextResponse.redirect(new URL(returnTo || '/console', request.url))
-      }
-    }
-
-    // Add user info to the response headers if available
-    if (user) {
-      response.headers.set('x-user-id', user.id);
     }
 
     return response;
