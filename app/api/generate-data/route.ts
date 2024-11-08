@@ -160,7 +160,7 @@ Always tailor the data to the user's prompt, ensuring it matches the requested c
     
     while (retryCount < maxRetries) {
       const { data, error: supabaseError } = await supabase
-        .from('responses')
+        .from('response')
         .insert([dataToStore])
         .select()
         .single();
