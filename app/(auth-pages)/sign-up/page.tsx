@@ -6,21 +6,18 @@ import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 import { useState } from "react";
 
-interface PageProps {
-  searchParams?: { 
-    message?: string;
-  };
-}
-
-export default function Signup({ searchParams = {} }: PageProps) {
+export default function Signup() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const message: Message = searchParams.message 
-    ? { message: searchParams.message } 
+  
+  // Access searchParams directly without using React.use
+  const message: Message = searchParams.get('message')
+    ? { message: searchParams.get('message')! }
     : {};
 
   async function handleSubmit(formData: FormData) {

@@ -6,22 +6,19 @@ import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 import { useState } from "react";
 
-interface PageProps {
-  searchParams?: { 
-    returnTo?: string;
-    message?: string;
-  };
-}
-
-export default function Login({ searchParams = {} }: PageProps) {
+export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const returnTo = searchParams.returnTo || '';
-  const message = searchParams.message ? { message: searchParams.message } : {};
+  
+  const returnTo = searchParams.get('returnTo') || '';
+  const message: Message = searchParams.get('message') 
+    ? { message: searchParams.get('message')! } 
+    : {};
 
   async function handleSubmit(formData: FormData) {
     try {
@@ -108,7 +105,7 @@ export default function Login({ searchParams = {} }: PageProps) {
               {isLoading ? "Signing In..." : "Sign in"}
             </SubmitButton>
             
-            <FormMessage message={message as Message} />
+            <FormMessage message={message} />
           </div>
         </form>
       </div>
