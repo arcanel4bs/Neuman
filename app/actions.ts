@@ -99,3 +99,69 @@ export async function signOutAction() {
   await supabase.auth.signOut();
   redirect('/');
 }
+
+export async function forgotPasswordAction(formData: FormData) {
+  try {
+    const email = formData.get("email") as string;
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    });
+
+    if (error) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Check your email for the password reset link",
+    };
+  } catch (err) {
+    console.error("Password reset error:", err);
+    return {
+      error: true,
+      message: "An unexpected error occurred",
+    };
+  }
+}
+
+export async function resetPasswordAction(formData: FormData) {
+  try {
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      return {
+        error: true,
+        message: "Passwords do not match",
+      };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase.auth.updateUser({
+      password: password,
+    });
+
+    if (error) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Password updated successfully",
+    };
+  } catch (err) {
+    console.error("Password reset error:", err);
+    return {
+      error: true,
+      message: "An unexpected error occurred",
+    };
+  }
+}

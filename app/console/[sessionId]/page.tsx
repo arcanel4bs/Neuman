@@ -2,13 +2,14 @@ import { createClient } from '@/utils/supabase/server'
 import ConsolePage from '@/components/ConsolePage'
 import { redirect } from 'next/navigation'
 
-export default async function ConsoleSessionPage({ 
-  params 
-}: { 
-  params: Promise<{ sessionId: string }> | { sessionId: string }
-}) {
-  // Await the params to get the sessionId
-  const { sessionId } = await params
+interface ConsolePageParams {
+  params: {
+    sessionId: string;
+  };
+}
+
+export default async function ConsoleSessionPage({ params }: ConsolePageParams) {
+  const { sessionId } = params;
   
   const supabase = await createClient()
   const { data: { user }, error } = await supabase.auth.getUser()
