@@ -1,18 +1,43 @@
+"use client";
+
 import { signInAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
+import { useState } from "react";
 
 interface LoginProps {
-  searchParams: Promise<{ returnTo?: string } & Message>
+  searchParams: { returnTo?: string } & Message;
 }
 
-export default async function Login(props: LoginProps) {
-  const searchParams = await props.searchParams;
+export default function Login({ searchParams }: LoginProps) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const returnTo = searchParams.returnTo || '';
+
+  async function handleSubmit(formData: FormData) {
+    try {
+      setIsLoading(true);
+      const response = await signInAction(formData);
+      
+      if (response.error) {
+        setIsLoading(false);
+        // Handle error display
+        return;
+      }
+
+      if (response.success && response.redirectTo) {
+        router.push(response.redirectTo);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Sign in error:', error);
+    }
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black relative">
@@ -73,10 +98,11 @@ export default async function Login(props: LoginProps) {
 
             <SubmitButton 
               pendingText="Signing In..." 
-              formAction={signInAction}
+              formAction={handleSubmit}
               className="w-full bg-gray-400 hover:bg-gray-200 mt-6 rounded-full transition-all transform hover:scale-105"
+              disabled={isLoading}
             >
-              Sign in
+              {isLoading ? "Signing In..." : "Sign in"}
             </SubmitButton>
             
             <FormMessage message={searchParams} />

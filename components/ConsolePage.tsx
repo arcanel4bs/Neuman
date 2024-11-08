@@ -116,10 +116,10 @@ export default function ConsolePage({ sessionId }: ConsolePageProps) {
           <ArrowLeft className="h-5 w-5" />
         </Link>
         
-        <div className="absolute left-12 sm:left-16 text-xl text-white">Neuman</div>
+        <div className="absolute left-12 sm:left-16 text-lg text-white">Neuman</div>
         
         <div className="text-center">
-          <h1 className="text-2xl sm:text-3xl text-white font-light">Synthetic Data Engine</h1>
+          <h1 className="text-xl sm:text-2xl text-white font-light">Synthetic Data Engine</h1>
           <p className="text-xs sm:text-sm text-gray-400 mt-1">Generate high-quality data</p>
         </div>
         
@@ -130,7 +130,7 @@ export default function ConsolePage({ sessionId }: ConsolePageProps) {
                 <UserIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 bg-black border border-gray-800">
               <DropdownMenuItem asChild>
                 <Link href="/profile">Profile</Link>
               </DropdownMenuItem>
@@ -153,7 +153,7 @@ export default function ConsolePage({ sessionId }: ConsolePageProps) {
           <div className="h-full flex flex-col max-w-4xl mx-auto">
             {generatedData && (
               <div className="flex-1 mb-4 sm:mb-6">
-                <div className="bg-gray-800/50 rounded-2xl relative">
+                <div className="bg-black border border-gray-800 rounded-2xl relative shadow-lg">
                   <div className="absolute top-2 right-2 flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -211,7 +211,7 @@ export default function ConsolePage({ sessionId }: ConsolePageProps) {
                       setPrompt(suggestion)
                       setShowSuggestions(false)
                     }}
-                    className="text-xs sm:text-sm bg-gray-800/50 hover:bg-gray-800/70 text-gray-300 px-3 py-1.5 rounded-full transition-colors"
+                    className="text-xs sm:text-sm bg-black border border-gray-800 hover:border-gray-700 text-gray-300 px-3 py-1.5 rounded-full transition-colors"
                   >
                     {trimTitle(suggestion)}
                   </button>
@@ -220,7 +220,7 @@ export default function ConsolePage({ sessionId }: ConsolePageProps) {
             )}
 
             <form onSubmit={handleSubmit} className="relative mt-auto">
-              <div className="flex gap-2 items-center bg-gray-800/30 rounded-full p-1.5 sm:p-2">
+              <div className="flex gap-2 items-center bg-black border border-gray-800 rounded-full p-1.5 sm:p-2">
                 <div className="flex gap-1 sm:gap-2 px-2">
                   <div className="relative">
                     <FaCode className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs sm:text-sm" />
@@ -234,6 +234,10 @@ export default function ConsolePage({ sessionId }: ConsolePageProps) {
                       <option value="CSV" disabled>CSV (Soon)</option>
                     </select>
                   </div>
+                  <div className="flex items-center justify-center gap-2">
+            <BsDatabase className="w-4 h-4 text-gray-400" />
+            
+          </div>
                   <div className="relative">
                     <select
                       id="dataSize"

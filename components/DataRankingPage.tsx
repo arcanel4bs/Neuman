@@ -6,7 +6,8 @@ interface DataRankingPageProps {
   sessionId: string
 }
 
-
+// Add import at the top
+import { BsDatabase } from 'react-icons/bs'
 
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/utils/supabase/client'
@@ -276,7 +277,10 @@ export default function DataRankingPage({ sessionId }: DataRankingPageProps) {
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <h1 className="text-3xl font-light">Data Generation Rankings</h1>
+            <div className="flex items-center gap-2">
+              <BsDatabase className="w-4 h-4 text-gray-400" />
+              <h1 className="text-2xl font-light">Data Generation Rankings</h1>
+            </div>
           </div>
           {!sessionId && (
             <button
@@ -294,8 +298,8 @@ export default function DataRankingPage({ sessionId }: DataRankingPageProps) {
             onClick={() => handleSort('score')}
             className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all ${
               sortBy === 'score' 
-                ? 'bg-gray-800/50 text-white' 
-                : 'bg-gray-800/30 text-gray-400 hover:bg-gray-800/50 hover:text-white'
+                ? 'bg-black border border-gray-700 text-white' 
+                : 'bg-black border border-gray-800 text-gray-400 hover:border-gray-700 hover:text-white'
             }`}
           >
             Popular
@@ -305,8 +309,8 @@ export default function DataRankingPage({ sessionId }: DataRankingPageProps) {
             onClick={() => handleSort('rating')}
             className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all ${
               sortBy === 'rating' 
-                ? 'bg-gray-800/50 text-white' 
-                : 'bg-gray-800/30 text-gray-400 hover:bg-gray-800/50 hover:text-white'
+                ? 'bg-black border border-gray-700 text-white' 
+                : 'bg-black border border-gray-800 text-gray-400 hover:border-gray-700 hover:text-white'
             }`}
           >
             Sort by Rating
@@ -316,8 +320,8 @@ export default function DataRankingPage({ sessionId }: DataRankingPageProps) {
             onClick={() => handleSort('date')}
             className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all ${
               sortBy === 'date' 
-                ? 'bg-gray-800/50 text-white' 
-                : 'bg-gray-800/30 text-gray-400 hover:bg-gray-800/50 hover:text-white'
+                ? 'bg-black border border-gray-700 text-white' 
+                : 'bg-black border border-gray-800 text-gray-400 hover:border-gray-700 hover:text-white'
             }`}
           >
             Sort by Date
@@ -327,7 +331,7 @@ export default function DataRankingPage({ sessionId }: DataRankingPageProps) {
 
         <div className="space-y-6">
           {sortedRecords.map((record) => (
-            <div key={record.id} className="border border-gray-800 hover:border-gray-700 rounded-xl p-6 bg-gray-800/30">
+            <div key={record.id} className="border border-gray-800 hover:border-gray-700 rounded-xl p-6 bg-black shadow-lg">
               <div className="flex gap-4 mb-4">
                 <div className="flex flex-col items-center gap-1">
                   <button
@@ -356,14 +360,14 @@ export default function DataRankingPage({ sessionId }: DataRankingPageProps) {
                 <div className="flex-1">
                   <h2 className="text-xl font-light mb-2 text-white">{record.prompt}</h2>
                   <div className="flex gap-2 text-sm">
-                    <span className="bg-gray-800/50 text-gray-300 px-3 py-1 rounded-full">
+                    <span className="bg-black border border-gray-800 text-gray-300 px-3 py-1 rounded-full">
                       {record.format}
                     </span>
-                    <span className="bg-gray-800/50 text-gray-300 px-3 py-1 rounded-full">
+                    <span className="bg-black border border-gray-800 text-gray-300 px-3 py-1 rounded-full">
                       {record.data_size}
                     </span>
                     {record.metadata?.total_records && (
-                      <span className="bg-gray-800/50 text-gray-300 px-3 py-1 rounded-full">
+                      <span className="bg-black border border-gray-800 text-gray-300 px-3 py-1 rounded-full">
                         {record.metadata.total_records} records
                       </span>
                     )}
@@ -386,7 +390,7 @@ export default function DataRankingPage({ sessionId }: DataRankingPageProps) {
                 </div>
               </div>
 
-              <div className="relative bg-gray-800/50 rounded-xl">
+              <div className="relative bg-black border border-gray-800 rounded-xl">
                 <div className="absolute top-2 right-2 flex items-center gap-2">
                   <button
                     onClick={() => handleCopy(record.generated_data)}

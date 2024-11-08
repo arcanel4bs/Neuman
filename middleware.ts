@@ -59,9 +59,9 @@ export async function middleware(request: NextRequest) {
         if (returnTo) {
           return NextResponse.redirect(new URL(returnTo, request.url));
         } else if (session) {
-          return NextResponse.redirect(new URL(`/console/${session.id}`, request.url));
+          return NextResponse.redirect(new URL(`/dashboard/${session.id}`, request.url));
         } else {
-          return NextResponse.redirect(new URL('/console', request.url));
+          return NextResponse.redirect(new URL('/dashboard', request.url));
         }
       }
       return response;

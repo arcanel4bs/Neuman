@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { getOrCreateSession } from "@/utils/supabase/sessions";
 
 export async function signInAction(formData: FormData) {
   try {
@@ -29,37 +30,23 @@ export async function signInAction(formData: FormData) {
       };
     }
 
-    // Get or create a session immediately after successful login
-    const { data: existingSession } = await supabase
-      .from("console_sessions")
-      .select()
-      .eq("user_id", data.user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
-
-    if (!existingSession) {
-      const { data: newSession } = await supabase
-        .from("console_sessions")
-        .insert([{
-          user_id: data.user.id,
-          title: "New Session",
-        }])
-        .select()
-        .single();
-        
-      if (newSession) {
-        redirect(returnTo || `/console/${newSession.id}`);
-      }
-    } else {
-      redirect(returnTo || `/console/${existingSession.id}`);
+    // Use the utility function from sessions.ts to handle session creation
+    const session = await getOrCreateSession(data.user.id);
+    
+    if (!session) {
+      return {
+        error: true,
+        message: "Failed to create session",
+      };
     }
 
-    // This will only run if redirect() fails
+    // Return success with redirect URL instead of redirecting directly
+    // This allows the client to handle the loading state properly
     return {
       success: true,
-      redirectTo: returnTo || "/console"
+      redirectTo: returnTo || `/console/${session.id}`
     };
+
   } catch (err) {
     console.error("Sign in error:", err);
     return {
