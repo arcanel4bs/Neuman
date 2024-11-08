@@ -1,4 +1,4 @@
-# Neuman - AI-Powered Data Generation Platform
+# Neuman - Data Plataform
 
 <p align="center">
  A powerful data generation platform built with Next.js and Supabase
@@ -15,7 +15,7 @@
 
 ## Demo
 
-<video src="public/neuman-demo.mp4" autoplay loop muted playsinline />
+<video src="public/neuman-demo.mp4" autoplay loop muted playsinline></video>
 
 ## Features
 
@@ -151,3 +151,5 @@ response = requests.post(
 ## Support and Feedback
 
 Please file feedback and issues over on the [GitHub repository](https://github.com/yourusername/neuman/issues).
+
+
