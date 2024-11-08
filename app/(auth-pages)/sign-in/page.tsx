@@ -10,14 +10,15 @@ import { useRouter } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 import { useState } from "react";
 
-interface LoginProps {
-  searchParams: { returnTo?: string } & Message;
-}
+type PageProps = {
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
 
-export default function Login({ searchParams }: LoginProps) {
+export default function Login({ searchParams = {} }: PageProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const returnTo = searchParams.returnTo || '';
+  const returnTo = searchParams.returnTo as string || '';
+  const message = searchParams.message ? { message: searchParams.message as string } : {};
 
   async function handleSubmit(formData: FormData) {
     try {
@@ -26,7 +27,6 @@ export default function Login({ searchParams }: LoginProps) {
       
       if (response.error) {
         setIsLoading(false);
-        // Handle error display
         return;
       }
 
@@ -105,7 +105,7 @@ export default function Login({ searchParams }: LoginProps) {
               {isLoading ? "Signing In..." : "Sign in"}
             </SubmitButton>
             
-            <FormMessage message={searchParams} />
+            <FormMessage message={message as Message} />
           </div>
         </form>
       </div>
