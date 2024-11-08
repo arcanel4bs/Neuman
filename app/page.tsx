@@ -49,7 +49,7 @@ export default async function Index({
         </h1>
         <p className="text-lg sm:text-xl text-gray-400 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed">
           Generate large amounts of high-quality data in seconds. 
-          Visit our <Link href={'/data-ranking'}>data ranking system</Link> to check out how our users are using Neuman.
+          Visit our <Link href={'/data-ranking'} className="text-transparent bg-gradient-to-r from-blue-400">data ranking system</Link> to check out how our users are using Neuman.
           
         </p>
         
